@@ -2,6 +2,9 @@ import numpy as np
 import pandas as pd
 import lightgbm as lgb
 
+from sklearn.linear_model import LogisticRegression, Ridge
+from sklearn.preprocessing import StandardScaler
+
 
 def runLGB(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, meta=None):
     print('Prep LGB')
@@ -99,3 +102,43 @@ def runMLP(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, 
         pred_test_y2 = None
     # TODO: Return history object
     return pred_test_y, pred_test_y2, None, model
+
+
+def runLR(train_X, train_y, test_X, test_y, test_X2, params):
+    params['random_state'] = 42
+    if params.get('scale'):
+        print_step('Scale')
+        params.pop('scale')
+        scaler = StandardScaler()
+        scaler.fit(train_X.values)
+        train_X = scaler.transform(train_X.values)
+        test_X = scaler.transform(test_X.values)
+        test_X2 = scaler.transform(test_X2.values)
+
+
+    print_step('Train LR')
+    model = LogisticRegression(**params)
+    model.fit(train_X, train_y)
+    print_step('Predict 1/2')
+    pred_test_y = model.predict_proba(test_X)[:, 1]
+    print_step('Predict 2/2')
+    pred_test_y2 = model.predict_proba(test_X2)[:, 1]
+    return pred_test_y, pred_test_y2, None
+
+
+def runRidge(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}):
+    model = Ridge(**params)
+    tracker.tick('Fit Ridge')
+    model.fit(train_X, train_y)
+    if test_X is not None:
+        tracker.tick('Ridge Predict 1/2')
+        pred_test_y = model.predict(test_X)
+    else:
+        pred_test_y = None
+    if test_X2 is not None:
+        print_step('Ridge Predict 2/2')
+        pred_test_y2 = model.predict(test_X2)
+    else:
+        pred_test_y2 = None
+    return pred_test_y, pred_test_y2, model.coef_, model
+
