@@ -1,0 +1,15 @@
+README.md
+setup.py
+mlgear/__init__.py
+mlgear/aggregators.py
+mlgear/cv.py
+mlgear/encoders.py
+mlgear/lr_scheduler.py
+mlgear/metrics.py
+mlgear/models.py
+mlgear/tracker.py
+mlgear/utils.py
+mlgear.egg-info/PKG-INFO
+mlgear.egg-info/SOURCES.txt
+mlgear.egg-info/dependency_links.txt
+mlgear.egg-info/top_level.txt
