@@ -1,3 +1,3 @@
 ## MLGear
 
-Utility scripts for machine learning
+Some utility functions to make ML with Python / Pandas / sklearn even easier
