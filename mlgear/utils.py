@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pandas as pd
 import numpy as np
 
@@ -9,3 +11,7 @@ def show(df, max_rows=10, max_cols=None, digits=6):
         print(df)
     if isinstance(df, pd.DataFrame) or isinstance(df, np.ndarray):
         print(df.shape)
+
+
+def print_step(step):
+    print('[{}] {}'.format(datetime.now(), step))
