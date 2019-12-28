@@ -15,3 +15,8 @@ def show(df, max_rows=10, max_cols=None, digits=6):
 
 def print_step(step):
     print('[{}] {}'.format(datetime.now(), step))
+
+
+def chunk(l, n):
+    for i in range(0, len(l), n):
+        yield l[i:i + n]
