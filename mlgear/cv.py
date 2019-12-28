@@ -4,7 +4,11 @@ import pandas as pd
 from sklearn.model_selection import KFold
 
 
-def run_cv_model(train, test, target, model_fn, params={}, eval_fn=None, label='model', n_folds=5, fold_splits=None, classes=1, stop_on_fold=None, train_on_full=False):
+def run_cv_model(train, test=None, target=None, model_fn=None, params={}, eval_fn=None, label='model', n_folds=5, fold_splits=None, classes=1, stop_on_fold=None, train_on_full=False):
+    if target is None:
+        raise ValueError('Target is needed.')
+    if model_fn is None:
+        raise ValueError('model function is needed.')
     if not fold_splits:
         kf = KFold(n_splits=n_folds, random_state=42, shuffle=True)
         fold_splits = kf.split(train)
