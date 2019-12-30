@@ -18,5 +18,7 @@ def print_step(step):
 
 
 def chunk(l, n):
+    out = []
     for i in range(0, len(l), n):
-        yield l[i:i + n]
+        out.append(l[i:i + n])
+    return out
