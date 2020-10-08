@@ -13,6 +13,20 @@ def show(df, max_rows=10, max_cols=None, digits=6):
         print(df.shape)
 
 
+def display_column(df, var):
+	if df[var].nunique() > 9 and (df[var].dtype == int or df[var].dtype == float):
+		print('Mean: {} Median: {} SD: {}'.format(df[var].mean(), df[var].median(), df[var].std()))
+	else:
+		print(df[var].value_counts(normalize=True) * 100)
+
+def display_columns(df)
+	for var in sorted(df.columns):
+		print('## {} ##'.format(var))
+		display_column(df, var)
+		print('-')
+		print('-')
+
+
 def print_step(step):
     print('[{}] {}'.format(datetime.now(), step))
 
