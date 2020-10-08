@@ -5,6 +5,7 @@ Some utility functions to make ML with Python / Pandas / sklearn even easier
 #### Example Usage
 
 ```Python
+from mlgear.cv import run_cv_model
 from mlgear.models import runLGB
 from mlgear.metrics import rmse
 
