@@ -19,7 +19,7 @@ def display_column(df, var):
 	else:
 		print(df[var].value_counts(normalize=True) * 100)
 
-def display_columns(df)
+def display_columns(df):
 	for var in sorted(df.columns):
 		print('## {} ##'.format(var))
 		display_column(df, var)
