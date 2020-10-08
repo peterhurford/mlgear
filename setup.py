@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
      name='mlgear',  
-     version='0.2',
+     version='0.3',
      author='Peter Hurford',
      author_email='peter@peterhurford.com',
      description='Utility scripts for machine learning',
