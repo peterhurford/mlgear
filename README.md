@@ -2,7 +2,7 @@
 
 Some utility functions to make ML with Python / Pandas / sklearn even easier
 
-#### Example Usage
+### Example Usage
 
 ```Python
 from mlgear.cv import run_cv_model
@@ -27,3 +27,7 @@ lgb_params = {'application': 'regression',
 
 results = run_cv_model(train, test, target, runLGB, lgb_params, rmse)
 ```
+
+### Installation
+
+`pip3 install mlgear`
