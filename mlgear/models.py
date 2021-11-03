@@ -8,15 +8,17 @@ from sklearn.preprocessing import StandardScaler
 from mlgear.utils import print_step
 
 
-def runLGB(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, meta=None):
-    print('Prep LGB')
+def runLGB(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, meta=None, verbose=True):
+    if verbose:
+        print_step('Prep LGB')
     d_train = lgb.Dataset(train_X, label=train_y)
     if test_X is not None:
         d_valid = lgb.Dataset(test_X, label=test_y)
         watchlist = [d_train, d_valid]
     else:
         watchlist = [d_train]
-    print('Train LGB')
+    if verbose:
+        print_step('Train LGB')
     num_rounds = params.pop('num_rounds')
     verbose_eval = params.pop('verbose_eval')
     early_stop = None
@@ -48,11 +50,13 @@ def runLGB(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, 
                           categorical_feature=cat_cols,
                           feval=feval)
         if test_X is not None:
-            print('Predict 1/2')
+            if verbose:
+                print_step('Predict 1/2')
             pred_test_y = model.predict(test_X, num_iteration=model.best_iteration)
             preds_test_y += [pred_test_y]
         if test_X2 is not None:
-            print('Predict 2/2')
+            if verbose:
+                print_step('Predict 2/2')
             pred_test_y2 = model.predict(test_X2, num_iteration=model.best_iteration)
             preds_test_y2 += [pred_test_y2]
 
@@ -78,14 +82,16 @@ def get_lgb_feature_importance(train, target, params):
     return feature_df
 
 
-def runMLP(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, meta=None):
-    print('Define Model')
+def runMLP(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, meta=None, verbose=True):
+    if verbose:
+        print_step('Define Model')
     model = params['model'](params['input_size'])
     es = params['early_stopper']()
     es.set_model(model)
     metric = params['metric']
     metric = metric(model, [es], [(train_X, train_y), (test_X, test_y)])
-    print('Fit MLP')
+    if verbose:
+        print_step('Fit MLP')
     model.fit(train_X, train_y,
               verbose=params.get('model_verbose', 0),
               callbacks=[metric] + params['lr_scheduler'](),
@@ -93,12 +99,14 @@ def runMLP(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, 
               validation_data=(test_X, test_y),
               batch_size=params.get('batch_size', 128))
     if test_X is not None:
-        print('MLP Predict 1/2')
+        if verbose:
+            print_step('MLP Predict 1/2')
         pred_test_y = model.predict(test_X)
     else:
         pred_test_y = None
     if test_X2 is not None:
-        print('MLP Predict 2/2')
+        if verbose:
+            print_step('MLP Predict 2/2')
         pred_test_y2 = model.predict(test_X2)
     else:
         pred_test_y2 = None
@@ -106,10 +114,11 @@ def runMLP(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, 
     return pred_test_y, pred_test_y2, None, model
 
 
-def runLR(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, meta=None):
+def runLR(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, meta=None, verbose=True):
     params['random_state'] = 42
     if params.get('scale'):
-        print_step('Scale')
+        if verbose:
+            print_step('Scale')
         params.pop('scale')
         scaler = StandardScaler()
         scaler.fit(train_X.values)
@@ -119,33 +128,39 @@ def runLR(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, m
         if test_X2 is not None:
             test_X2 = scaler.transform(test_X2.values)
 
-    print_step('Train LR')
+    if verbose:
+        print_step('Train LR')
     model = LogisticRegression(**params)
     model.fit(train_X, train_y)
     if test_X is not None:
-        print_step('Predict 1/2')
+        if verbose:
+            print_step('Predict 1/2')
         pred_test_y = model.predict_proba(test_X)[:, 1]
     else:
         pred_test_y = None
     if test_X2 is not None:
-        print_step('Predict 2/2')
+        if verbose:
+            print_step('Predict 2/2')
         pred_test_y2 = model.predict_proba(test_X2)[:, 1]
     else:
         pred_test_y2 = None
     return pred_test_y, pred_test_y2, model.coef_, model
 
 
-def runRidge(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, meta=None):
+def runRidge(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, meta=None, verbose=True):
     model = Ridge(**params)
-    print_step('Fit Ridge')
+    if verbose:
+        print_step('Fit Ridge')
     model.fit(train_X, train_y)
     if test_X is not None:
-        print_step('Ridge Predict 1/2')
+        if verbose:
+            print_step('Ridge Predict 1/2')
         pred_test_y = model.predict(test_X)
     else:
         pred_test_y = None
     if test_X2 is not None:
-        print_step('Ridge Predict 2/2')
+        if verbose:
+            print_step('Ridge Predict 2/2')
         pred_test_y2 = model.predict(test_X2)
     else:
         pred_test_y2 = None
