@@ -14,7 +14,7 @@ def show(df, max_rows=10, max_cols=None, digits=6):
 
 
 def display_column(df, var):
-	if df[var].nunique() > 9 and (df[var].dtype == int or df[var].dtype == float):
+	if df[var].astype(str).nunique() > 9 and (df[var].dtype == int or df[var].dtype == float):
 		print('Mean: {} Median: {} SD: {}'.format(df[var].mean(), df[var].median(), df[var].std()))
 	else:
 		print(df[var].value_counts(normalize=True) * 100)
@@ -36,3 +36,7 @@ def chunk(l, n):
     for i in range(0, len(l), n):
         out.append(l[i:i + n])
     return out
+
+
+def min_max(dat):
+    return (min(dat), max(dat))
