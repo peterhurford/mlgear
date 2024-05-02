@@ -45,9 +45,7 @@ def runLGB(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, 
                           train_set=d_train,
                           num_boost_round=num_rounds,
                           valid_sets=watchlist,
-                          verbose_eval=verbose_eval,
-                          early_stopping_rounds=early_stop,
-                          categorical_feature=cat_cols,
+                          callbacks=[lgb.early_stopping(stopping_rounds=early_stop)] if early_stop else [],
                           feval=feval)
         if test_X is not None:
             if verbose:
