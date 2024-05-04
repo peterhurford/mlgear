@@ -18,7 +18,6 @@ def runLGB(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, 
         group = None
 
     num_rounds = params.pop('num_rounds')
-    verbose_eval = params.pop('verbose_eval')
     early_stop = None
     if params.get('early_stop'):
         early_stop = params.pop('early_stop')
@@ -96,8 +95,7 @@ def get_lgb_feature_importance(train, target, params):
     train_d = lgb.Dataset(train, label=target)
     lgb_params2 = params.copy()
     rounds = lgb_params2.pop('num_rounds', 400)
-    verbose_eval = lgb_params2.pop('verbose_eval', 100)
-    model = lgb.train(lgb_params2, train_d, rounds, valid_sets = [train_d], verbose_eval=verbose_eval)
+    model = lgb.train(lgb_params2, train_d, rounds, valid_sets = [train_d])
     feature_df = pd.DataFrame(sorted(zip(model.feature_importance(), train.columns)),
                                columns=['Value', 'Feature']).sort_values('Value', ascending=False)
     return feature_df
