@@ -51,7 +51,10 @@ def run_cv_model(train, test=None, target=None, model_fn=None, params={}, eval_f
         models[i] = model
         if importances is not None and isinstance(train, pd.DataFrame):
             fold_importance_df = pd.DataFrame()
-            fold_importance_df['feature'] = train.columns.values
+            if params.get('group') is None:
+                fold_importance_df['feature'] = train.columns.values
+            else:
+                fold_importance_df['feature'] = [c for c in train.columns.values if c != params['group']]
             fold_importance_df['importance'] = importances
             fold_importance_df['fold'] = i
             feature_importance_df = pd.concat([feature_importance_df, fold_importance_df], axis=0)

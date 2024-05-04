@@ -11,14 +11,12 @@ from mlgear.utils import print_step
 def runLGB(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, meta=None, verbose=True):
     if verbose:
         print_step('Prep LGB')
-    d_train = lgb.Dataset(train_X, label=train_y)
-    if test_X is not None:
-        d_valid = lgb.Dataset(test_X, label=test_y)
-        watchlist = [d_train, d_valid]
+
+    if params.get('group'):
+        group = params.pop('group')
     else:
-        watchlist = [d_train]
-    if verbose:
-        print_step('Train LGB')
+        group = None
+
     num_rounds = params.pop('num_rounds')
     verbose_eval = params.pop('verbose_eval')
     early_stop = None
@@ -36,6 +34,31 @@ def runLGB(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, 
         feval = params.pop('feval')
     else:
         feval = None
+
+    if group is None:
+        d_train = lgb.Dataset(train_X, label=train_y)
+    else:
+        d_train = lgb.Dataset(train_X.drop(group, axis=1),
+                              label=train_y,
+                              group=train_X.groupby(group).size().to_numpy())
+
+    if test_X is not None:
+        if group is None:
+            d_valid = lgb.Dataset(test_X, label=test_y)
+        else:
+            d_valid = lgb.Dataset(test_X.drop(group, axis=1),
+                                  label=test_y,
+                                  group=test_X.groupby(group).size().to_numpy()) 
+            test_X = test_X.drop(group, axis=1)
+        watchlist = [d_train, d_valid]
+    else:
+        watchlist = [d_train]
+
+    if test_X2 is not None and group is not None:
+        test_X2 = test_X2.drop(group, axis=1)
+
+    if verbose:
+        print_step('Train LGB')
 
     preds_test_y = []
     preds_test_y2 = []

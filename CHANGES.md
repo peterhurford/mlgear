@@ -3,6 +3,7 @@
 * `display_columns` now works for dataframes that contain list data.
 * Add a new util: `min_max`, to return both the minimum and maximum.
 * Updates lightgbm to work on the latest version.
+* Supports lightgbm to do ranking.
 
 ## v0.4
 
