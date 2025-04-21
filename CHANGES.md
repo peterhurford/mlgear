@@ -1,4 +1,8 @@
-## v0.5
+## v0.6 - development
+
+* To come
+
+## v0.5 - latest release
 
 * `display_columns` now works for dataframes that contain list data.
 * Add a new util: `min_max`, to return both the minimum and maximum.

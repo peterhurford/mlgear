@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mlgear"
-version = "0.5"
+version = "0.6-dev0"
 description = "Utility scripts for machine learning"
 authors = ["Peter Hurford <peter@peterhurford.com>"]
 license = "MIT"
