@@ -4,6 +4,7 @@
 * Add a new util: `min_max`, to return both the minimum and maximum.
 * Updates lightgbm to work on the latest version.
 * Supports lightgbm to do ranking.
+* Migrated from setuptools/twine to Poetry for package management.
 
 ## v0.4
 

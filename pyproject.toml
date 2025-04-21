@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "mlgear"
+version = "0.5"
+description = "Utility scripts for machine learning"
+authors = ["Peter Hurford <peter@peterhurford.com>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/peterhurford/mlgear"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+keras = "*"
+lightgbm = "*"
+numpy = "*"
+pandas = "*"
+scikit-learn = "*"
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

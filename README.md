@@ -30,4 +30,22 @@ results = run_cv_model(train, test, target, runLGB, lgb_params, rmse)
 
 ### Installation
 
-`pip3 install mlgear`
+```
+pip install mlgear
+```
+
+For development:
+
+```
+# Install poetry if you don't have it
+pip install poetry
+
+# Install dependencies
+poetry install
+
+# Build the package
+poetry build
+
+# Publish to PyPI
+poetry publish
+```
