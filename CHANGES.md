@@ -13,6 +13,7 @@
 * Fix `Scaler` crashing with `AttributeError` when only `columns` or only `ordinals` is set
 * Add shape validation to `crps_score` and extract `CRPS_BINS` constant for the hardcoded 199
 * Add type hints to all public functions
+* Add tests and export for `get_lgb_feature_importance`
 
 ## v0.5 - latest release
 

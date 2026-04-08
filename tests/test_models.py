@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from mlgear.models import runLGB, runLR, runRidge
+from mlgear.models import runLGB, runLR, runRidge, get_lgb_feature_importance
 
 
 @pytest.fixture
@@ -211,3 +211,45 @@ class TestRunRidge:
             train_X, train_y, test_X, test_y, verbose=False
         )
         assert pred_val.shape == (20,)
+
+
+class TestGetLgbFeatureImportance:
+    def test_returns_dataframe(self, binary_data):
+        X, y = binary_data
+        params = {
+            'objective': 'binary',
+            'metric': 'binary_logloss',
+            'num_rounds': 10,
+            'seed': 42,
+            'verbose': -1,
+        }
+        result = get_lgb_feature_importance(X, y, params)
+        assert isinstance(result, pd.DataFrame)
+        assert list(result.columns) == ['Value', 'Feature']
+        assert len(result) == 2
+        assert set(result['Feature']) == {'f1', 'f2'}
+
+    def test_sorted_descending(self, binary_data):
+        X, y = binary_data
+        params = {
+            'objective': 'binary',
+            'metric': 'binary_logloss',
+            'num_rounds': 10,
+            'seed': 42,
+            'verbose': -1,
+        }
+        result = get_lgb_feature_importance(X, y, params)
+        assert result['Value'].iloc[0] >= result['Value'].iloc[1]
+
+    def test_does_not_mutate_params(self, binary_data):
+        X, y = binary_data
+        params = {
+            'objective': 'binary',
+            'metric': 'binary_logloss',
+            'num_rounds': 10,
+            'seed': 42,
+            'verbose': -1,
+        }
+        original_keys = set(params.keys())
+        get_lgb_feature_importance(X, y, params)
+        assert set(params.keys()) == original_keys
