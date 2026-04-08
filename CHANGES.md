@@ -5,6 +5,7 @@
 * Lazy-import keras in `metrics.py` and `lr_scheduler.py` so the package is usable without tensorflow
 * Fix `runLR` mutating the caller's `params` dict (missing `.copy()`)
 * Fix `ValueCountsEncoder` and `BayesTargetEncoder` mutating the input DataFrame during `transform`
+* Bump minimum Python version from 3.7 (EOL) to 3.9
 
 ## v0.5 - latest release
 
