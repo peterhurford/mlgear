@@ -1,20 +1,21 @@
-import numpy as np
-
 from math import sqrt
+from typing import Sequence, Union
+
+import numpy as np
 from sklearn.metrics import mean_squared_error
 
 
 CRPS_BINS = 199
 
 
-def crps_score(actual, predicted):
+def crps_score(actual: np.ndarray, predicted: np.ndarray) -> float:
     if actual.shape[1] != CRPS_BINS:
         raise ValueError(
             'crps_score expects {} bins, got {} columns'.format(CRPS_BINS, actual.shape[1])
         )
     return ((predicted - actual) ** 2).sum(axis=1).sum(axis=0) / (CRPS_BINS * actual.shape[0])
 
-def crps_score_(actual, predicted):
+def crps_score_(actual: np.ndarray, predicted: np.ndarray) -> float:
     actual = np.clip(np.cumsum(actual, axis=1), 0, 1)
     predicted = np.clip(np.cumsum(predicted, axis=1), 0, 1)
     return crps_score(actual, predicted)
@@ -31,11 +32,12 @@ def k_crps_(y_true, y_pred):
     y_pred = K.clip(K.cumsum(y_pred, axis=1), 0, 1)
     return K.sum(K.sum(K.square(y_true - y_pred), axis=1), axis=0)
 
-def crps_lgb(actual, predicted):
+def crps_lgb(actual: np.ndarray, predicted: np.ndarray) -> float:
     actual_ = np.zeros((actual.shape[0], CRPS_BINS))
     for idx, target in enumerate(list(actual)):
         actual_[idx][int(target)] = 1
     return crps_score_(actual_, predicted)
 
-def rmse(actual, predicted):
+def rmse(actual: Union[Sequence[float], np.ndarray],
+         predicted: Union[Sequence[float], np.ndarray]) -> float:
     return sqrt(mean_squared_error(actual, predicted))

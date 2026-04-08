@@ -1,3 +1,5 @@
+from typing import Dict, List, Optional, Tuple
+
 import pandas as pd
 
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -8,12 +10,12 @@ class CategoricalDummyEncoder(TransformerMixin):
     """Identifies categorical columns by dtype of object and dummy codes them. Optionally a pandas.DataFrame
     can be returned where categories are of pandas.Category dtype and not binarized for better coding strategies
     than dummy coding."""
-    def __init__(self, sparse=False):
-        self.categorical_variables = []
-        self.categories_per_column = {}
+    def __init__(self, sparse: bool = False) -> None:
+        self.categorical_variables: List[str] = []
+        self.categories_per_column: Dict = {}
         self.sparse = sparse
 
-    def fit(self, X, categories=None):
+    def fit(self, X: pd.DataFrame, categories: Optional[List[str]] = None) -> 'CategoricalDummyEncoder':
         if categories is None:
             self.categorical_variables = list(X.select_dtypes(include=['object']).columns)
         else:
@@ -22,7 +24,7 @@ class CategoricalDummyEncoder(TransformerMixin):
             self.categories_per_column[col] = X[col].astype('category').cat.categories
         return self
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         X = pd.get_dummies(X, sparse=self.sparse, columns=self.categorical_variables)
         expected_columns = sum([['{}_{}'.format(k, v) for v in vs] for k, vs in self.categories_per_column.items()], [])
         for c in expected_columns:
@@ -32,11 +34,11 @@ class CategoricalDummyEncoder(TransformerMixin):
 
 
 class ValueCountsEncoder(TransformerMixin):
-    def __init__(self):
-        self.categorical_variables = []
-        self.categories_per_column = {}
+    def __init__(self) -> None:
+        self.categorical_variables: List[str] = []
+        self.categories_per_column: Dict[str, Dict] = {}
 
-    def fit(self, X, categories=None):
+    def fit(self, X: pd.DataFrame, categories: Optional[List[str]] = None) -> 'ValueCountsEncoder':
         if categories is None:
             self.categorical_variables = list(X.select_dtypes(include=['object']).columns)
         else:
@@ -45,7 +47,7 @@ class ValueCountsEncoder(TransformerMixin):
             self.categories_per_column[col] = dict(X[col].value_counts().items())
         return self
 
-    def transform(self, X, suffix=''):
+    def transform(self, X: pd.DataFrame, suffix: str = '') -> pd.DataFrame:
         X = X.copy()
         for col in self.categorical_variables:
             X.loc[:, '{}{}'.format(col, suffix)] = X[col].map(self.categories_per_column[col])
@@ -54,11 +56,12 @@ class ValueCountsEncoder(TransformerMixin):
 
 # Adapted from https://maxhalford.github.io/blog/target-encoding-done-the-right-way/
 class BayesTargetEncoder(TransformerMixin):
-    def __init__(self):
-        self.categorical_variables = []
-        self.categories_per_column = {}
+    def __init__(self) -> None:
+        self.categorical_variables: List[str] = []
+        self.categories_per_column: Dict[str, pd.Series] = {}
 
-    def fit(self, X, target, weight=10, categories=None):
+    def fit(self, X: pd.DataFrame, target: str, weight: float = 10,
+            categories: Optional[List[str]] = None) -> 'BayesTargetEncoder':
         if categories is None:
             self.categorical_variables = list(X.select_dtypes(include=['object']).columns)
         else:
@@ -72,7 +75,7 @@ class BayesTargetEncoder(TransformerMixin):
             self.categories_per_column[col] = smooth
         return self
 
-    def transform(self, X, suffix=''):
+    def transform(self, X: pd.DataFrame, suffix: str = '') -> pd.DataFrame:
         X = X.copy()
         for col in self.categorical_variables:
             X.loc[:, '{}{}'.format(col, suffix)] = X[col].map(self.categories_per_column[col])
@@ -81,20 +84,21 @@ class BayesTargetEncoder(TransformerMixin):
 
 # https://stackoverflow.com/questions/37685412/avoid-scaling-binary-columns-in-sci-kit-learn-standsardscaler
 class Scaler(BaseEstimator, TransformerMixin):
-    def __init__(self, columns=None, ordinals=None, copy=True, feature_range=(0, 1)):
+    def __init__(self, columns: Optional[List[str]] = None, ordinals: Optional[List[str]] = None,
+                 copy: bool = True, feature_range: Tuple[float, float] = (0, 1)) -> None:
         self.columns = columns
         self.ordinals = ordinals
         self.scaler = PowerTransformer(method='yeo-johnson', standardize=True, copy=True) if columns else None
         self.ordinal_scaler = MinMaxScaler(copy=copy, feature_range=feature_range) if ordinals else None
 
-    def fit(self, X, y=None):
+    def fit(self, X: pd.DataFrame, y=None) -> 'Scaler':
         if self.columns:
             self.scaler.fit(X[self.columns], y)
         if self.ordinals:
             self.ordinal_scaler.fit(X[self.ordinals], y)
         return self
 
-    def transform(self, X, y=None, copy=None):
+    def transform(self, X: pd.DataFrame, y=None, copy=None) -> pd.DataFrame:
         init_col_order = X.columns
         if self.columns:
             X_scaled = X[self.columns]

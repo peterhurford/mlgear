@@ -12,6 +12,7 @@
 * Replace mutable default `params={}` with `params=None` in all model functions and `run_cv_model`
 * Fix `Scaler` crashing with `AttributeError` when only `columns` or only `ordinals` is set
 * Add shape validation to `crps_score` and extract `CRPS_BINS` constant for the hardcoded 199
+* Add type hints to all public functions
 
 ## v0.5 - latest release
 

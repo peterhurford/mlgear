@@ -1,3 +1,5 @@
+from typing import Any, Dict, Optional, Tuple, Union
+
 import numpy as np
 import pandas as pd
 import lightgbm as lgb
@@ -7,8 +9,13 @@ from sklearn.preprocessing import StandardScaler
 
 from mlgear.utils import print_step
 
+ModelResult = Tuple[Optional[np.ndarray], Optional[np.ndarray], Optional[np.ndarray], Any]
 
-def runLGB(train_X, train_y, test_X=None, test_y=None, test_X2=None, params=None, meta=None, verbose=True):
+
+def runLGB(train_X: pd.DataFrame, train_y: np.ndarray,
+           test_X: Optional[pd.DataFrame] = None, test_y: Optional[np.ndarray] = None,
+           test_X2: Optional[pd.DataFrame] = None, params: Optional[Dict[str, Any]] = None,
+           meta: Optional[Dict[str, Any]] = None, verbose: bool = True) -> ModelResult:
     if params is None:
         params = {}
     if verbose:
@@ -118,7 +125,8 @@ def runLGB(train_X, train_y, test_X=None, test_y=None, test_X2=None, params=None
     return pred_test_y, pred_test_y2, model.feature_importance(), model
 
 
-def get_lgb_feature_importance(train, target, params):
+def get_lgb_feature_importance(train: pd.DataFrame, target: np.ndarray,
+                               params: Dict[str, Any]) -> pd.DataFrame:
     train_d = lgb.Dataset(train, label=target)
     lgb_params2 = params.copy()
     rounds = lgb_params2.pop('num_rounds', 400)
@@ -162,7 +170,10 @@ def runMLP(train_X, train_y, test_X=None, test_y=None, test_X2=None, params=None
     return pred_test_y, pred_test_y2, None, model
 
 
-def runLR(train_X, train_y, test_X=None, test_y=None, test_X2=None, params=None, meta=None, verbose=True):
+def runLR(train_X: pd.DataFrame, train_y: np.ndarray,
+          test_X: Optional[pd.DataFrame] = None, test_y: Optional[np.ndarray] = None,
+          test_X2: Optional[pd.DataFrame] = None, params: Optional[Dict[str, Any]] = None,
+          meta: Optional[Dict[str, Any]] = None, verbose: bool = True) -> ModelResult:
     if params is None:
         params = {}
     params = params.copy()
@@ -198,7 +209,10 @@ def runLR(train_X, train_y, test_X=None, test_y=None, test_X2=None, params=None,
     return pred_test_y, pred_test_y2, model.coef_, model
 
 
-def runRidge(train_X, train_y, test_X=None, test_y=None, test_X2=None, params=None, meta=None, verbose=True):
+def runRidge(train_X: pd.DataFrame, train_y: np.ndarray,
+             test_X: Optional[pd.DataFrame] = None, test_y: Optional[np.ndarray] = None,
+             test_X2: Optional[pd.DataFrame] = None, params: Optional[Dict[str, Any]] = None,
+             meta: Optional[Dict[str, Any]] = None, verbose: bool = True) -> ModelResult:
     if params is None:
         params = {}
     model = Ridge(**params)
@@ -218,4 +232,3 @@ def runRidge(train_X, train_y, test_X=None, test_y=None, test_X2=None, params=No
     else:
         pred_test_y2 = None
     return pred_test_y, pred_test_y2, model.coef_, model
-

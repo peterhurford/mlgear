@@ -1,3 +1,5 @@
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
+
 import numpy as np
 import pandas as pd
 
@@ -6,7 +8,13 @@ from sklearn.model_selection import KFold
 from mlgear.utils import print_step
 
 
-def run_cv_model(train, test=None, target=None, model_fn=None, params=None, eval_fn=None, label='model', n_folds=5, fold_splits=None, classes=1, stop_on_fold=None, train_on_full=False, verbose=True):
+def run_cv_model(train: Union[pd.DataFrame, np.ndarray], test: Optional[Union[pd.DataFrame, np.ndarray]] = None,
+                 target: Optional[np.ndarray] = None, model_fn: Optional[Callable] = None,
+                 params: Optional[Dict[str, Any]] = None, eval_fn: Optional[Callable] = None,
+                 label: str = 'model', n_folds: int = 5,
+                 fold_splits: Optional[Iterable[Tuple[np.ndarray, np.ndarray]]] = None,
+                 classes: int = 1, stop_on_fold: Optional[int] = None,
+                 train_on_full: bool = False, verbose: bool = True) -> Dict[str, Any]:
     if target is None:
         raise ValueError('Target is needed.')
     if model_fn is None:
@@ -16,8 +24,8 @@ def run_cv_model(train, test=None, target=None, model_fn=None, params=None, eval
     if not fold_splits:
         kf = KFold(n_splits=n_folds, random_state=42, shuffle=True)
         fold_splits = kf.split(train)
-    cv_scores = []
-    models = {}
+    cv_scores: List[float] = []
+    models: Dict[Any, Any] = {}
     if classes > 1 and test is not None:
        pred_full_test = np.zeros((test.shape[0], classes))
     else:
@@ -81,7 +89,7 @@ def run_cv_model(train, test=None, target=None, model_fn=None, params=None, eval
         models['full'] = model
     elif test is not None:
         pred_full_test = pred_full_test / n_folds
-   
+
     final_cv = eval_fn(target, pred_train) if eval_fn else None
 
     if verbose:
@@ -98,4 +106,4 @@ def run_cv_model(train, test=None, target=None, model_fn=None, params=None, eval
                'model': models}
     if test is not None:
         results['test'] = pred_full_test
-    return results 
+    return results
