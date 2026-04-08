@@ -2,6 +2,7 @@
 
 * Support for `init_score`.
 * Add tests
+* Lazy-import keras in `metrics.py` and `lr_scheduler.py` so the package is usable without tensorflow
 
 ## v0.5 - latest release
 

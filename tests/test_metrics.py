@@ -1,13 +1,7 @@
 import numpy as np
 import pytest
 
-# metrics.py imports keras at module level, which requires tensorflow.
-# Use importorskip to gracefully skip if keras/tf aren't available.
-metrics = pytest.importorskip("mlgear.metrics", reason="requires keras/tensorflow")
-
-rmse = metrics.rmse
-crps_score = metrics.crps_score
-crps_score_ = metrics.crps_score_
+from mlgear.metrics import rmse, crps_score, crps_score_
 
 
 class TestRmse:

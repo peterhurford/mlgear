@@ -1,6 +1,5 @@
 import random
 
-from keras import backend as K
 from keras.callbacks import Callback
 
 
@@ -40,6 +39,7 @@ class CustomLRScheduler(Callback):
     
     
     def on_epoch_end(self, epoch, logs=None):
+        from keras import backend as K
         # Get base LR
         lr = K.get_value(self.model.optimizer.lr)
         
