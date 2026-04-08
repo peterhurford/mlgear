@@ -46,6 +46,7 @@ class ValueCountsEncoder(TransformerMixin):
         return self
 
     def transform(self, X, suffix=''):
+        X = X.copy()
         for col in self.categorical_variables:
             X.loc[:, '{}{}'.format(col, suffix)] = X[col].map(self.categories_per_column[col])
         return X
@@ -72,6 +73,7 @@ class BayesTargetEncoder(TransformerMixin):
         return self
 
     def transform(self, X, suffix=''):
+        X = X.copy()
         for col in self.categorical_variables:
             X.loc[:, '{}{}'.format(col, suffix)] = X[col].map(self.categories_per_column[col])
         return X

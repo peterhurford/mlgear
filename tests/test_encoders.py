@@ -73,6 +73,13 @@ class TestValueCountsEncoder:
         enc.fit(cat_df, categories=['color'])
         assert enc.categorical_variables == ['color']
 
+    def test_does_not_mutate_input(self, cat_df):
+        enc = ValueCountsEncoder()
+        enc.fit(cat_df, categories=['color'])
+        original_cols = list(cat_df.columns)
+        enc.transform(cat_df, suffix='_vc')
+        assert list(cat_df.columns) == original_cols
+
 
 class TestBayesTargetEncoder:
     def test_fit_transform(self):
@@ -98,6 +105,17 @@ class TestBayesTargetEncoder:
         # With high weight, both should be pulled toward global mean (0.5)
         assert result['cat'].iloc[0] < 1.0
         assert result['cat'].iloc[2] > 0.0
+
+    def test_does_not_mutate_input(self):
+        df = pd.DataFrame({
+            'cat': ['a', 'a', 'b', 'b'],
+            'target': [1, 1, 0, 0],
+        })
+        enc = BayesTargetEncoder()
+        enc.fit(df, target='target')
+        original_values = list(df['cat'])
+        enc.transform(df)
+        assert list(df['cat']) == original_values
 
 
 class TestScaler:
