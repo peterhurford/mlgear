@@ -27,6 +27,12 @@ class TestCrpsScore:
         result = crps_score(actual, predicted)
         assert result > 0
 
+    def test_wrong_bin_count_raises(self):
+        actual = np.zeros((2, 100))
+        predicted = np.zeros((2, 100))
+        with pytest.raises(ValueError, match='expects 199 bins'):
+            crps_score(actual, predicted)
+
 
 class TestCrpsScore_:
     def test_perfect(self):
