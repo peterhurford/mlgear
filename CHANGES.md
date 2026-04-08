@@ -8,6 +8,7 @@
 * Bump minimum Python version from 3.7 (EOL) to 3.9
 * Remove legacy `requirements.txt` and `setup.cfg` (flake8 config moved to `.flake8`)
 * Add public API exports to `__init__.py` (e.g. `from mlgear import run_cv_model, runLGB`)
+* Add `pytest` to dev dependencies
 
 ## v0.5 - latest release
 

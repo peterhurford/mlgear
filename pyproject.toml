@@ -23,6 +23,7 @@ scikit-learn = "*"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "*"
+pytest = "*"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
