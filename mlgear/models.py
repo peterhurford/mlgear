@@ -34,25 +34,42 @@ def runLGB(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, 
     else:
         feval = None
 
+    # Extract init_score if present (for base_margin / odds anchoring)
+    init_score_col = params.pop('init_score_col', None)
+    train_init_score = None
+    test_init_score = None
+    if init_score_col and init_score_col in train_X.columns:
+        train_init_score = train_X[init_score_col].values
+        train_X = train_X.drop(columns=[init_score_col])
+        if test_X is not None and init_score_col in test_X.columns:
+            test_init_score = test_X[init_score_col].values
+            test_X = test_X.drop(columns=[init_score_col])
+
     if group is None:
-        d_train = lgb.Dataset(train_X, label=train_y)
+        d_train = lgb.Dataset(train_X, label=train_y, init_score=train_init_score)
     else:
         d_train = lgb.Dataset(train_X.drop(group, axis=1),
                               label=train_y,
+                              init_score=train_init_score,
                               group=train_X.groupby(group).size().to_numpy())
 
     if test_X is not None:
         if group is None:
-            d_valid = lgb.Dataset(test_X, label=test_y)
+            d_valid = lgb.Dataset(test_X, label=test_y, init_score=test_init_score)
         else:
             d_valid = lgb.Dataset(test_X.drop(group, axis=1),
                                   label=test_y,
-                                  group=test_X.groupby(group).size().to_numpy()) 
+                                  init_score=test_init_score,
+                                  group=test_X.groupby(group).size().to_numpy())
             test_X = test_X.drop(group, axis=1)
         watchlist = [d_train, d_valid]
     else:
         watchlist = [d_train]
 
+    test_init_score2 = None
+    if init_score_col and test_X2 is not None and init_score_col in test_X2.columns:
+        test_init_score2 = test_X2[init_score_col].values
+        test_X2 = test_X2.drop(columns=[init_score_col])
     if test_X2 is not None and group is not None:
         test_X2 = test_X2.drop(group, axis=1)
 
@@ -73,11 +90,19 @@ def runLGB(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, 
             if verbose:
                 print_step('Predict 1/2')
             pred_test_y = model.predict(test_X, num_iteration=model.best_iteration)
+            # If init_score was used, predict() returns raw margin (trees only).
+            # Add init_score back and apply sigmoid to get probability.
+            if test_init_score is not None:
+                raw_margin = np.log(pred_test_y.clip(1e-15, 1-1e-15) / (1 - pred_test_y.clip(1e-15, 1-1e-15)))
+                pred_test_y = 1 / (1 + np.exp(-(raw_margin + test_init_score)))
             preds_test_y += [pred_test_y]
         if test_X2 is not None:
             if verbose:
                 print_step('Predict 2/2')
             pred_test_y2 = model.predict(test_X2, num_iteration=model.best_iteration)
+            if test_init_score2 is not None:
+                raw_margin2 = np.log(pred_test_y2.clip(1e-15, 1-1e-15) / (1 - pred_test_y2.clip(1e-15, 1-1e-15)))
+                pred_test_y2 = 1 / (1 + np.exp(-(raw_margin2 + test_init_score2)))
             preds_test_y2 += [pred_test_y2]
 
     if test_X is not None:

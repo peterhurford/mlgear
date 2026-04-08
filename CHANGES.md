@@ -1,6 +1,6 @@
 ## v0.6 - development
 
-* To come
+* Support for `init_score`.
 
 ## v0.5 - latest release
 
