@@ -3,6 +3,7 @@
 * Support for `init_score`.
 * Add tests
 * Lazy-import keras in `metrics.py` and `lr_scheduler.py` so the package is usable without tensorflow
+* Fix `runLR` mutating the caller's `params` dict (missing `.copy()`)
 
 ## v0.5 - latest release
 

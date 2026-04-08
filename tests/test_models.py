@@ -161,6 +161,15 @@ class TestRunLR:
         assert pred_val is None
         assert pred_test is None
 
+    def test_does_not_mutate_params(self, binary_data):
+        X, y = binary_data
+        train_X, test_X = X.iloc[:80], X.iloc[80:]
+        train_y, test_y = y[:80], y[80:]
+        params = {'scale': True}
+        runLR(train_X, train_y, test_X, test_y, params=params, verbose=False)
+        assert 'scale' in params
+        assert 'random_state' not in params
+
 
 class TestRunRidge:
     def test_basic(self, regression_data):

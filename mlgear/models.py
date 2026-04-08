@@ -159,6 +159,7 @@ def runMLP(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, 
 
 
 def runLR(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, meta=None, verbose=True):
+    params = params.copy()
     params['random_state'] = 42
     if params.get('scale'):
         if verbose:
