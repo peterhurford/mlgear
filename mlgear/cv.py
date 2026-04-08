@@ -51,7 +51,9 @@ def run_cv_model(train, test=None, target=None, model_fn=None, params={}, eval_f
         models[i] = model
         if importances is not None and isinstance(train, pd.DataFrame):
             fold_importance_df = pd.DataFrame()
-            if params.get('group') is None:
+            if hasattr(model, 'feature_name') and callable(model.feature_name):
+                fold_importance_df['feature'] = model.feature_name()
+            elif params.get('group') is None:
                 fold_importance_df['feature'] = train.columns.values
             else:
                 fold_importance_df['feature'] = [c for c in train.columns.values if c != params['group']]
