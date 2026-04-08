@@ -10,6 +10,7 @@
 * Add public API exports to `__init__.py` (e.g. `from mlgear import run_cv_model, runLGB`)
 * Add `pytest` to dev dependencies
 * Replace mutable default `params={}` with `params=None` in all model functions and `run_cv_model`
+* Fix `Scaler` crashing with `AttributeError` when only `columns` or only `ordinals` is set
 
 ## v0.5 - latest release
 

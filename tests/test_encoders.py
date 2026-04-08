@@ -150,3 +150,32 @@ class TestScaler:
         scaler.fit(df)
         result = scaler.transform(df.copy())
         assert list(result['a']) == [1, 2, 3]
+
+    def test_columns_and_ordinals(self):
+        df = pd.DataFrame({
+            'a': [1.0, 2.0, 3.0, 4.0, 5.0],
+            'b': [10.0, 20.0, 30.0, 40.0, 50.0],
+            'c': [0, 1, 0, 1, 0],
+        })
+        scaler = Scaler(columns=['a'], ordinals=['b'])
+        scaler.fit(df)
+        result = scaler.transform(df.copy())
+        assert list(result.columns) == ['a', 'b', 'c']
+        # 'c' should be unchanged
+        assert list(result['c']) == [0, 1, 0, 1, 0]
+        # 'b' should be MinMaxScaled -> [0, 0.25, 0.5, 0.75, 1]
+        assert result['b'].iloc[0] == pytest.approx(0.0)
+        assert result['b'].iloc[4] == pytest.approx(1.0)
+
+    def test_scaler_attributes_always_exist(self):
+        s1 = Scaler(columns=['a'])
+        assert s1.scaler is not None
+        assert s1.ordinal_scaler is None
+
+        s2 = Scaler(ordinals=['a'])
+        assert s2.scaler is None
+        assert s2.ordinal_scaler is not None
+
+        s3 = Scaler()
+        assert s3.scaler is None
+        assert s3.ordinal_scaler is None

@@ -82,14 +82,10 @@ class BayesTargetEncoder(TransformerMixin):
 # https://stackoverflow.com/questions/37685412/avoid-scaling-binary-columns-in-sci-kit-learn-standsardscaler
 class Scaler(BaseEstimator, TransformerMixin):
     def __init__(self, columns=None, ordinals=None, copy=True, feature_range=(0, 1)):
-        # QuantileTransformer = RankGauss
-        if columns:
-            self.scaler = PowerTransformer(method='yeo-johnson', standardize=True, copy=True)
-            #self.scaler = QuantileTransformer(output_distribution='normal', copy=copy)
-        if ordinals:
-            self.ordinal_scaler = MinMaxScaler(copy=copy, feature_range=feature_range)
-        self.ordinals = ordinals
         self.columns = columns
+        self.ordinals = ordinals
+        self.scaler = PowerTransformer(method='yeo-johnson', standardize=True, copy=True) if columns else None
+        self.ordinal_scaler = MinMaxScaler(copy=copy, feature_range=feature_range) if ordinals else None
 
     def fit(self, X, y=None):
         if self.columns:
