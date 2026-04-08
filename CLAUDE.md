@@ -13,9 +13,10 @@ poetry install          # Install dependencies
 poetry build            # Build package
 poetry publish          # Publish to PyPI
 flake8 mlgear/          # Lint (max-line-length: 100)
+python -m pytest tests/ -v  # Run tests
 ```
 
-There is no test suite.
+Tests live in `tests/` and cover aggregators, utils, tracker, encoders, cv, and models. The metrics tests are skipped when tensorflow is not installed (keras backend dependency). Run with `python -m pytest tests/ -v`.
 
 ## Architecture
 
