@@ -6,6 +6,7 @@
 * Fix `runLR` mutating the caller's `params` dict (missing `.copy()`)
 * Fix `ValueCountsEncoder` and `BayesTargetEncoder` mutating the input DataFrame during `transform`
 * Bump minimum Python version from 3.7 (EOL) to 3.9
+* Remove legacy `requirements.txt` and `setup.cfg` (flake8 config moved to `.flake8`)
 
 ## v0.5 - latest release
 

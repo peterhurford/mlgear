@@ -41,4 +41,4 @@ Encoders in `encoders.py` are sklearn-compatible (fit/transform): `CategoricalDu
 - LightGBM `runLGB` supports ranking tasks (via `group` param), multi-bag ensembling (`nbag`), and init_score for base margin anchoring with logit/sigmoid post-processing.
 - `run_cv_model` defaults to KFold(n_splits=5, shuffle=True, random_state=42) but accepts custom `fold_splits`.
 - CRPS metrics in `metrics.py` are hardcoded for 199 bins.
-- Poetry is the build system (migrated from setuptools). `requirements.txt` and `setup.cfg` are legacy.
+- Poetry is the build system. Flake8 config lives in `.flake8`.
