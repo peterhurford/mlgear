@@ -6,11 +6,13 @@ from sklearn.model_selection import KFold
 from mlgear.utils import print_step
 
 
-def run_cv_model(train, test=None, target=None, model_fn=None, params={}, eval_fn=None, label='model', n_folds=5, fold_splits=None, classes=1, stop_on_fold=None, train_on_full=False, verbose=True):
+def run_cv_model(train, test=None, target=None, model_fn=None, params=None, eval_fn=None, label='model', n_folds=5, fold_splits=None, classes=1, stop_on_fold=None, train_on_full=False, verbose=True):
     if target is None:
         raise ValueError('Target is needed.')
     if model_fn is None:
         raise ValueError('model function is needed.')
+    if params is None:
+        params = {}
     if not fold_splits:
         kf = KFold(n_splits=n_folds, random_state=42, shuffle=True)
         fold_splits = kf.split(train)

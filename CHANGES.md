@@ -9,6 +9,7 @@
 * Remove legacy `requirements.txt` and `setup.cfg` (flake8 config moved to `.flake8`)
 * Add public API exports to `__init__.py` (e.g. `from mlgear import run_cv_model, runLGB`)
 * Add `pytest` to dev dependencies
+* Replace mutable default `params={}` with `params=None` in all model functions and `run_cv_model`
 
 ## v0.5 - latest release
 

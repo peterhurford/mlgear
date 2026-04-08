@@ -8,7 +8,9 @@ from sklearn.preprocessing import StandardScaler
 from mlgear.utils import print_step
 
 
-def runLGB(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, meta=None, verbose=True):
+def runLGB(train_X, train_y, test_X=None, test_y=None, test_X2=None, params=None, meta=None, verbose=True):
+    if params is None:
+        params = {}
     if verbose:
         print_step('Prep LGB')
 
@@ -126,7 +128,9 @@ def get_lgb_feature_importance(train, target, params):
     return feature_df
 
 
-def runMLP(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, meta=None, verbose=True):
+def runMLP(train_X, train_y, test_X=None, test_y=None, test_X2=None, params=None, meta=None, verbose=True):
+    if params is None:
+        params = {}
     if verbose:
         print_step('Define Model')
     model = params['model'](params['input_size'])
@@ -158,7 +162,9 @@ def runMLP(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, 
     return pred_test_y, pred_test_y2, None, model
 
 
-def runLR(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, meta=None, verbose=True):
+def runLR(train_X, train_y, test_X=None, test_y=None, test_X2=None, params=None, meta=None, verbose=True):
+    if params is None:
+        params = {}
     params = params.copy()
     params['random_state'] = 42
     if params.get('scale'):
@@ -192,7 +198,9 @@ def runLR(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, m
     return pred_test_y, pred_test_y2, model.coef_, model
 
 
-def runRidge(train_X, train_y, test_X=None, test_y=None, test_X2=None, params={}, meta=None, verbose=True):
+def runRidge(train_X, train_y, test_X=None, test_y=None, test_X2=None, params=None, meta=None, verbose=True):
+    if params is None:
+        params = {}
     model = Ridge(**params)
     if verbose:
         print_step('Fit Ridge')

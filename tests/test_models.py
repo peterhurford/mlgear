@@ -202,3 +202,12 @@ class TestRunRidge:
         )
         assert pred_val is None
         assert pred_test is None
+
+    def test_params_none_default(self, regression_data):
+        X, y = regression_data
+        train_X, test_X = X.iloc[:80], X.iloc[80:]
+        train_y, test_y = y[:80], y[80:]
+        pred_val, _, _, _ = runRidge(
+            train_X, train_y, test_X, test_y, verbose=False
+        )
+        assert pred_val.shape == (20,)
