@@ -3,6 +3,7 @@
 * **[Breaking change]** Internal - Bump minimum Python version from 3.7 (EOL) to 3.9
 * **[Breaking change]** Feature - Add shape validation to `crps_score` and extract `CRPS_BINS` constant for the hardcoded 199
 * Feature - Support for `init_score`.
+* Feature - Support for per-row `sample_weight` in `runLGB` via the `sample_weight_col` param (mirrors `init_score_col`).
 * Feature - Add public API exports to `__init__.py` (e.g. `from mlgear import run_cv_model, runLGB`)
 * Bugfix - Fix `runLR` mutating the caller's `params` dict (missing `.copy()`)
 * Bugfix - Fix `ValueCountsEncoder` and `BayesTargetEncoder` mutating the input DataFrame during `transform`

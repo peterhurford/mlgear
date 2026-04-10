@@ -54,21 +54,38 @@ def runLGB(train_X: pd.DataFrame, train_y: np.ndarray,
             test_init_score = test_X[init_score_col].values
             test_X = test_X.drop(columns=[init_score_col])
 
+    # Extract sample_weight if present (for per-row weighting in LGB Dataset)
+    sample_weight_col = params.pop('sample_weight_col', None)
+    train_sample_weight = None
+    test_sample_weight = None
+    if sample_weight_col and sample_weight_col in train_X.columns:
+        train_sample_weight = train_X[sample_weight_col].values
+        train_X = train_X.drop(columns=[sample_weight_col])
+        if test_X is not None and sample_weight_col in test_X.columns:
+            test_sample_weight = test_X[sample_weight_col].values
+            test_X = test_X.drop(columns=[sample_weight_col])
+
     if group is None:
-        d_train = lgb.Dataset(train_X, label=train_y, init_score=train_init_score)
+        d_train = lgb.Dataset(train_X, label=train_y,
+                              init_score=train_init_score,
+                              weight=train_sample_weight)
     else:
         d_train = lgb.Dataset(train_X.drop(group, axis=1),
                               label=train_y,
                               init_score=train_init_score,
+                              weight=train_sample_weight,
                               group=train_X.groupby(group).size().to_numpy())
 
     if test_X is not None:
         if group is None:
-            d_valid = lgb.Dataset(test_X, label=test_y, init_score=test_init_score)
+            d_valid = lgb.Dataset(test_X, label=test_y,
+                                  init_score=test_init_score,
+                                  weight=test_sample_weight)
         else:
             d_valid = lgb.Dataset(test_X.drop(group, axis=1),
                                   label=test_y,
                                   init_score=test_init_score,
+                                  weight=test_sample_weight,
                                   group=test_X.groupby(group).size().to_numpy())
             test_X = test_X.drop(group, axis=1)
         watchlist = [d_train, d_valid]
@@ -79,6 +96,10 @@ def runLGB(train_X: pd.DataFrame, train_y: np.ndarray,
     if init_score_col and test_X2 is not None and init_score_col in test_X2.columns:
         test_init_score2 = test_X2[init_score_col].values
         test_X2 = test_X2.drop(columns=[init_score_col])
+    if sample_weight_col and test_X2 is not None and sample_weight_col in test_X2.columns:
+        # test_X2 weights are not consumed by lgb.Dataset (no label for it),
+        # but we still drop the column so it doesn't get fed to predict() as a feature.
+        test_X2 = test_X2.drop(columns=[sample_weight_col])
     if test_X2 is not None and group is not None:
         test_X2 = test_X2.drop(group, axis=1)
 

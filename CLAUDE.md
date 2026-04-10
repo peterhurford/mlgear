@@ -32,7 +32,7 @@ def runXXX(train_X, train_y, test_X=None, test_y=None, test_X2=None, params=None
 
 - `test_X` / `test_y` = validation fold data (used for early stopping)
 - `test_X2` = held-out test set for final predictions
-- `params` defaults to `None` (replaced with `{}` internally). Keys like `num_rounds`, `early_stop`, `group`, `cat_cols`, `feval`, `init_score_col` are popped before passing to the underlying library. The caller's dict is not mutated — `run_cv_model` and `runLR` copy it internally.
+- `params` defaults to `None` (replaced with `{}` internally). Keys like `num_rounds`, `early_stop`, `group`, `cat_cols`, `feval`, `init_score_col`, `sample_weight_col` are popped before passing to the underlying library. The caller's dict is not mutated — `run_cv_model` and `runLR` copy it internally.
 - `meta` carries fold metadata (`dev_index`, `val_index`, `fold`, `label`)
 
 `get_lgb_feature_importance()` is a standalone utility for quick feature importance without full CV.
@@ -43,7 +43,7 @@ All public functions have type hints. Public API is exported from `__init__.py` 
 
 ## Key Details
 
-- LightGBM `runLGB` supports ranking tasks (via `group` param), multi-bag ensembling (`nbag`), and init_score for base margin anchoring with logit/sigmoid post-processing.
+- LightGBM `runLGB` supports ranking tasks (via `group` param), multi-bag ensembling (`nbag`), init_score for base margin anchoring with logit/sigmoid post-processing, and per-row `sample_weight_col` (column extracted from each X frame and passed to `lgb.Dataset(weight=...)`).
 - `run_cv_model` defaults to KFold(n_splits=5, shuffle=True, random_state=42) but accepts custom `fold_splits`.
 - CRPS metrics in `metrics.py` use `CRPS_BINS = 199`. `crps_score` validates input shape matches this.
 - Keras-dependent code (`k_crps`, `k_crps_`, `runMLP`, `CustomLRScheduler`) uses lazy imports so the rest of the package works without tensorflow.
