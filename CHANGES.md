@@ -3,6 +3,7 @@
 * **[Breaking change]** Internal - Bump minimum Python version from 3.7 (EOL) to 3.9
 * **[Breaking change]** Feature - Add shape validation to `crps_score` and extract `CRPS_BINS` constant for the hardcoded 199
 * Feature - Support for `init_score`.
+* Feature - Lambdarank predictions now correctly reconstitute `init_score` (raw score + init_score → sigmoid) instead of using the binary logit round-trip.
 * Feature - Support for per-row `sample_weight` in `runLGB` via the `sample_weight_col` param (mirrors `init_score_col`).
 * Feature - Add public API exports to `__init__.py` (e.g. `from mlgear import run_cv_model, runLGB`)
 * Bugfix - Fix `runLR` mutating the caller's `params` dict (missing `.copy()`)

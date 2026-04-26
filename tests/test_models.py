@@ -1,8 +1,10 @@
+from unittest.mock import patch, MagicMock
+
 import numpy as np
 import pandas as pd
 import pytest
 
-from mlgear.models import runLGB, runLR, runRidge, get_lgb_feature_importance
+from mlgear.models import runLGB, runLR, runRidge, get_lgb_feature_importance, _sigmoid, _logit
 
 
 @pytest.fixture
@@ -207,6 +209,119 @@ class TestRunLGB:
         # Caller's frames must still contain the weight column.
         assert '_sample_weight' in train_X.columns
         assert '_sample_weight' in test_X.columns
+
+
+def _mock_lgb_model(predict_values):
+    """Create a mock LGB model that returns fixed predict values."""
+    model = MagicMock()
+    model.best_iteration = 10
+    model.feature_importance.return_value = np.array([1, 1])
+    model.predict.return_value = predict_values
+    return model
+
+
+class TestLambdarankInitScore:
+    """Test init_score reconstitution for both binary and lambdarank objectives."""
+
+    def test_binary_init_score_reconstitution(self):
+        """Binary predict() returns probabilities; verify logit→add→sigmoid round-trip."""
+        raw_probs = np.array([0.3, 0.7, 0.5])
+        init_scores = np.array([0.5, -0.5, 1.0])
+        model = _mock_lgb_model(raw_probs)
+
+        X = pd.DataFrame({'f1': [1, 2, 3], 'f2': [4, 5, 6], 'is': init_scores})
+        y = np.array([0, 1, 1])
+        params = {
+            'objective': 'binary', 'metric': 'binary_logloss',
+            'num_rounds': 10, 'seed': 42, 'verbose': -1,
+            'init_score_col': 'is',
+        }
+        with patch('mlgear.models.lgb.train', return_value=model):
+            with patch('mlgear.models.lgb.Dataset'):
+                pred, _, _, _ = runLGB(X, y, X.copy(), y, params=params, verbose=False)
+
+        expected = _sigmoid(_logit(raw_probs) + init_scores)
+        np.testing.assert_allclose(pred, expected)
+
+    def test_lambdarank_init_score_reconstitution(self):
+        """Lambdarank predict() returns raw scores; verify score+init→sigmoid."""
+        raw_scores = np.array([-1.0, 0.0, 2.0])
+        init_scores = np.array([0.5, -0.5, 1.0])
+        model = _mock_lgb_model(raw_scores)
+
+        X = pd.DataFrame({'f1': [1, 2, 3], 'f2': [4, 5, 6], 'is': init_scores})
+        y = np.array([0, 1, 1])
+        params = {
+            'objective': 'lambdarank', 'metric': 'ndcg',
+            'num_rounds': 10, 'seed': 42, 'verbose': -1,
+            'init_score_col': 'is',
+        }
+        with patch('mlgear.models.lgb.train', return_value=model):
+            with patch('mlgear.models.lgb.Dataset'):
+                pred, _, _, _ = runLGB(X, y, X.copy(), y, params=params, verbose=False)
+
+        expected = _sigmoid(raw_scores + init_scores)
+        np.testing.assert_allclose(pred, expected)
+
+    def test_lambdarank_without_init_score_returns_raw(self):
+        """Lambdarank without init_score should return raw scores, not sigmoid."""
+        raw_scores = np.array([-1.0, 0.0, 2.0])
+        model = _mock_lgb_model(raw_scores)
+
+        X = pd.DataFrame({'f1': [1, 2, 3], 'f2': [4, 5, 6]})
+        y = np.array([0, 1, 1])
+        params = {
+            'objective': 'lambdarank', 'metric': 'ndcg',
+            'num_rounds': 10, 'seed': 42, 'verbose': -1,
+        }
+        with patch('mlgear.models.lgb.train', return_value=model):
+            with patch('mlgear.models.lgb.Dataset'):
+                pred, _, _, _ = runLGB(X, y, X.copy(), y, params=params, verbose=False)
+
+        # Raw scores returned unchanged — no sigmoid applied
+        np.testing.assert_allclose(pred, raw_scores)
+
+    def test_lambdarank_init_score_test_x2(self):
+        """Verify init_score reconstitution works for test_X2 as well."""
+        val_scores = np.array([0.1, 0.2, 0.3])
+        x2_scores = np.array([-0.5, 1.5])
+        x2_init = np.array([0.2, -0.3])
+
+        model = MagicMock()
+        model.best_iteration = 10
+        model.feature_importance.return_value = np.array([1, 1])
+        model.predict.side_effect = [val_scores, x2_scores]
+
+        X = pd.DataFrame({'f1': [1, 2, 3], 'f2': [4, 5, 6], 'is': [0.0, 0.0, 0.0]})
+        X2 = pd.DataFrame({'f1': [7, 8], 'f2': [9, 10], 'is': x2_init})
+        y = np.array([0, 1, 1])
+        params = {
+            'objective': 'lambdarank', 'metric': 'ndcg',
+            'num_rounds': 10, 'seed': 42, 'verbose': -1,
+            'init_score_col': 'is',
+        }
+        with patch('mlgear.models.lgb.train', return_value=model):
+            with patch('mlgear.models.lgb.Dataset'):
+                _, pred2, _, _ = runLGB(X, y, X.copy(), y, X2.copy(),
+                                        params=params, verbose=False)
+
+        expected = _sigmoid(x2_scores + x2_init)
+        np.testing.assert_allclose(pred2, expected)
+
+
+class TestSigmoidLogit:
+    def test_sigmoid_known_values(self):
+        np.testing.assert_allclose(_sigmoid(np.array([0.0])), [0.5])
+        assert _sigmoid(np.array([100.0]))[0] > 0.999
+
+    def test_logit_inverts_sigmoid(self):
+        p = np.array([0.1, 0.5, 0.9])
+        np.testing.assert_allclose(_sigmoid(_logit(p)), p)
+
+    def test_logit_clips_extremes(self):
+        # Should not produce inf/-inf for 0.0 and 1.0
+        result = _logit(np.array([0.0, 1.0]))
+        assert np.all(np.isfinite(result))
 
 
 class TestRunLR:

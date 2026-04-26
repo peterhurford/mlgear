@@ -12,6 +12,15 @@ from mlgear.utils import print_step
 ModelResult = Tuple[Optional[np.ndarray], Optional[np.ndarray], Optional[np.ndarray], Any]
 
 
+def _sigmoid(x: np.ndarray) -> np.ndarray:
+    return 1 / (1 + np.exp(-x))
+
+
+def _logit(p: np.ndarray) -> np.ndarray:
+    p = np.clip(p, 1e-15, 1 - 1e-15)
+    return np.log(p / (1 - p))
+
+
 def runLGB(train_X: pd.DataFrame, train_y: np.ndarray,
            test_X: Optional[pd.DataFrame] = None, test_y: Optional[np.ndarray] = None,
            test_X2: Optional[pd.DataFrame] = None, params: Optional[Dict[str, Any]] = None,
@@ -20,6 +29,9 @@ def runLGB(train_X: pd.DataFrame, train_y: np.ndarray,
         params = {}
     if verbose:
         print_step('Prep LGB')
+
+    # Detect lambdarank before params get modified by pops
+    is_lambdarank = params.get('objective') == 'lambdarank'
 
     if params.get('group'):
         group = params.pop('group')
@@ -120,19 +132,23 @@ def runLGB(train_X: pd.DataFrame, train_y: np.ndarray,
             if verbose:
                 print_step('Predict 1/2')
             pred_test_y = model.predict(test_X, num_iteration=model.best_iteration)
-            # If init_score was used, predict() returns raw margin (trees only).
-            # Add init_score back and apply sigmoid to get probability.
+            # Reconstitute predictions with init_score.
+            # Binary predict() returns probabilities; lambdarank returns raw scores.
             if test_init_score is not None:
-                raw_margin = np.log(pred_test_y.clip(1e-15, 1-1e-15) / (1 - pred_test_y.clip(1e-15, 1-1e-15)))
-                pred_test_y = 1 / (1 + np.exp(-(raw_margin + test_init_score)))
+                if is_lambdarank:
+                    pred_test_y = _sigmoid(pred_test_y + test_init_score)
+                else:
+                    pred_test_y = _sigmoid(_logit(pred_test_y) + test_init_score)
             preds_test_y += [pred_test_y]
         if test_X2 is not None:
             if verbose:
                 print_step('Predict 2/2')
             pred_test_y2 = model.predict(test_X2, num_iteration=model.best_iteration)
             if test_init_score2 is not None:
-                raw_margin2 = np.log(pred_test_y2.clip(1e-15, 1-1e-15) / (1 - pred_test_y2.clip(1e-15, 1-1e-15)))
-                pred_test_y2 = 1 / (1 + np.exp(-(raw_margin2 + test_init_score2)))
+                if is_lambdarank:
+                    pred_test_y2 = _sigmoid(pred_test_y2 + test_init_score2)
+                else:
+                    pred_test_y2 = _sigmoid(_logit(pred_test_y2) + test_init_score2)
             preds_test_y2 += [pred_test_y2]
 
     if test_X is not None:
