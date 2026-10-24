@@ -21,16 +21,16 @@ def crps_score_(actual: np.ndarray, predicted: np.ndarray) -> float:
     return crps_score(actual, predicted)
 
 def k_crps(y_true, y_pred):
-    from keras import backend as K
-    y_true = K.clip(K.cumsum(y_true, axis=1), 0, 1)
-    y_pred = K.clip(K.cumsum(y_pred, axis=1), 0, 1)
-    return K.sum(K.sum(K.square(y_true - y_pred), axis=1), axis=0) / K.cast(CRPS_BINS * K.shape(y_true)[0], 'float32')
+    from keras import ops
+    y_true = ops.clip(ops.cumsum(y_true, axis=1), 0, 1)
+    y_pred = ops.clip(ops.cumsum(y_pred, axis=1), 0, 1)
+    return ops.sum(ops.square(y_true - y_pred)) / ops.cast(CRPS_BINS * ops.shape(y_true)[0], 'float32')
 
 def k_crps_(y_true, y_pred):
-    from keras import backend as K
-    y_true = K.clip(K.cumsum(y_true, axis=1), 0, 1)
-    y_pred = K.clip(K.cumsum(y_pred, axis=1), 0, 1)
-    return K.sum(K.sum(K.square(y_true - y_pred), axis=1), axis=0)
+    from keras import ops
+    y_true = ops.clip(ops.cumsum(y_true, axis=1), 0, 1)
+    y_pred = ops.clip(ops.cumsum(y_pred, axis=1), 0, 1)
+    return ops.sum(ops.square(y_true - y_pred))
 
 def crps_lgb(actual: np.ndarray, predicted: np.ndarray) -> float:
     actual_ = np.zeros((actual.shape[0], CRPS_BINS))

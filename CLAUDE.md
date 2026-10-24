@@ -17,7 +17,7 @@ flake8 mlgear/                  # Lint (max-line-length: 100)
 python -m pytest tests/ -v      # Run tests
 ```
 
-Tests live in `tests/` and cover aggregators, utils, tracker, encoders, cv, models, and metrics. Run with `python -m pytest tests/ -v`.
+Tests live in `tests/` and cover aggregators, utils, tracker, encoders, cv, models, metrics, and models. Run with `python -m pytest tests/ -v`.
 
 ## Architecture
 
@@ -46,7 +46,7 @@ All public functions have type hints. Public API is exported from `__init__.py` 
 - LightGBM `runLGB` supports ranking tasks (via `group` param), multi-bag ensembling (`nbag`), init_score for base margin anchoring with logit/sigmoid post-processing, and per-row `sample_weight_col` (column extracted from each X frame and passed to `lgb.Dataset(weight=...)`).
 - `run_cv_model` defaults to KFold(n_splits=5, shuffle=True, random_state=42) but accepts custom `fold_splits`.
 - CRPS metrics in `metrics.py` use `CRPS_BINS = 199`. `crps_score` validates input shape matches this.
-- Keras-dependent code (`k_crps`, `k_crps_`, `runMLP`, `CustomLRScheduler`) uses lazy imports so the rest of the package works without tensorflow.
+- Keras-dependent code (`k_crps`, `k_crps_`, `runMLP`, `CustomLRScheduler`) targets keras 3 (`keras.ops`, `optimizer.learning_rate`) and uses lazy imports so the rest of the package works without tensorflow.
 - Poetry is the build system. Flake8 config lives in `.flake8`. Pytest config lives in `pyproject.toml`.
 
 ## Change Workflow

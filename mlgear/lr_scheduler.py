@@ -39,9 +39,9 @@ class CustomLRScheduler(Callback):
     
     
     def on_epoch_end(self, epoch, logs=None):
-        from keras import backend as K
+        from keras import ops
         # Get base LR
-        lr = K.get_value(self.model.optimizer.lr)
+        lr = float(ops.convert_to_numpy(self.model.optimizer.learning_rate))
         
         # Increment epoch count
         self.epoch_count = self.epoch_count + 1
@@ -53,7 +53,7 @@ class CustomLRScheduler(Callback):
             new_lr = self.init_lr + (((self.max_lr - self.init_lr) / self.warmup_epochs) * self.epoch_count)
             if self.verbose > 0:
                 print('{} (warm up) - LR -> {}'.format(self.label, new_lr))
-            K.set_value(self.model.optimizer.lr, new_lr)
+            self.model.optimizer.learning_rate = new_lr
             if self.verbose > 1:
                 print('{} debug - warm up {}/{} LR {}/{}'.format(self.label, self.epoch_count, self.warmup_epochs, new_lr, self.max_lr))
             return None
@@ -100,7 +100,7 @@ class CustomLRScheduler(Callback):
                 new_lr = self.min_lr
             if self.verbose > 0:
                 print('{} (down) - LR -> {}'.format(self.label, new_lr))
-            K.set_value(self.model.optimizer.lr, new_lr)
+            self.model.optimizer.learning_rate = new_lr
             self.notices = 0 # Reset patience threshold
             if self.verbose > 1:
                 print('{} debug - up_count {}/{} notices {}/{}'.format(self.label, self.up_count, self.up_every, self.notices, self.patience))
@@ -118,7 +118,7 @@ class CustomLRScheduler(Callback):
                 new_lr = self.max_lr
             if self.verbose > 0:
                 print('{} (up) - LR -> {}'.format(self.label, new_lr))
-            K.set_value(self.model.optimizer.lr, new_lr)
+            self.model.optimizer.learning_rate = new_lr
             self.up_count = 0 # Reset up_count
             self.notices = 0  # Also reset notices
         if self.verbose > 1:

@@ -7,6 +7,7 @@
 * Feature - Lambdarank predictions now correctly reconstitute `init_score` (raw score + init_score → sigmoid) instead of using the binary logit round-trip.
 * Feature - Support for per-row `sample_weight` in `runLGB` via the `sample_weight_col` param (mirrors `init_score_col`).
 * Feature - Add public API exports to `__init__.py` (e.g. `from mlgear import run_cv_model, runLGB`)
+* Bugfix - Port `k_crps`, `k_crps_` and `CustomLRScheduler` to keras 3 (`keras.ops`, `optimizer.learning_rate`); they raised `AttributeError` on any keras 3
 * Bugfix - Fix `runLR` mutating the caller's `params` dict (missing `.copy()`)
 * Bugfix - Fix `ValueCountsEncoder` and `BayesTargetEncoder` mutating the input DataFrame during `transform`
 * Bugfix - Replace mutable default `params={}` with `params=None` in all model functions and `run_cv_model`
