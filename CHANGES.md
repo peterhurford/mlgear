@@ -15,6 +15,7 @@
 * Internal - Lazy-import keras in `metrics.py` and `lr_scheduler.py` so the package is usable without tensorflow
 * Internal - Add type hints to all public functions
 * Internal - Add tests
+* Internal - Add optional `keras` dev group (`poetry install --with keras`) with tensorflow, and keras tests that skip without it
 * Internal - Add `pytest` to dev dependencies
 * Internal - Remove legacy `requirements.txt` and `setup.cfg` (flake8 config moved to `.flake8`)
 

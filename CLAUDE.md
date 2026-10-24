@@ -11,13 +11,14 @@ A Python utility library for ML workflows with pandas/sklearn. Provides cross-va
 ```bash
 pip install -e .                # Install in editable mode
 poetry install                  # Install dependencies
+poetry install --with keras     # Also install tensorflow (needed for tests/test_keras.py)
 poetry build                    # Build package
 poetry publish                  # Publish to PyPI
 flake8 mlgear/                  # Lint (max-line-length: 100)
 python -m pytest tests/ -v      # Run tests
 ```
 
-Tests live in `tests/` and cover aggregators, utils, tracker, encoders, cv, models, metrics, and models. Run with `python -m pytest tests/ -v`.
+Tests live in `tests/` and cover aggregators, utils, tracker, encoders, cv, models, metrics, and keras code (`tests/test_keras.py`, skipped unless tensorflow from the optional `keras` group is installed). Run with `python -m pytest tests/ -v`.
 
 ## Architecture
 
