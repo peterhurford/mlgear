@@ -1,7 +1,7 @@
 ## v0.6 - development
 
 * **[Breaking change]** Internal - Bump minimum Python version from 3.7 (EOL) to 3.11 (required by keras 3.15)
-* **[Breaking change]** Internal - Require `keras>=3.15.0`, `numpy>=1.22` and `scikit-learn>=1.5.0` to clear security advisories; relock (Pygments 2.21.0, zipp dropped)
+* **[Breaking change]** Internal - Require `keras>=3.15.0` and `scikit-learn>=1.5.0` to clear security advisories, and `numpy>=2.3` (2.2.x silently corrupts arrays on Python 3.14); relock (Pygments 2.21.0, zipp dropped)
 * **[Breaking change]** Feature - Add shape validation to `crps_score` and extract `CRPS_BINS` constant for the hardcoded 199
 * **[Breaking change]** Bugfix - `CustomLRScheduler` no longer counts the first epoch after warmup toward `patience` or `up_every`, so `patience=N` drops LR after N non-improving epochs, not N-1
 * Feature - Support for `init_score`.
