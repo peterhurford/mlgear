@@ -18,6 +18,8 @@ flake8 mlgear/                  # Lint (max-line-length: 100)
 python -m pytest tests/ -v      # Run tests
 ```
 
+Run Poetry as `env -u VIRTUAL_ENV poetry ...`: Poetry installs into whatever venv `VIRTUAL_ENV` names, and if that is the shared pyenv `dev` env it overwrites packages other projects use. Unset, it uses the project's `.venv`.
+
 Tests live in `tests/` and cover aggregators, utils, tracker, encoders, cv, models, metrics, and keras code (`tests/test_keras.py`, skipped unless tensorflow from the optional `keras` group is installed). Run with `python -m pytest tests/ -v`.
 
 ## Architecture
