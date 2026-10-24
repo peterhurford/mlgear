@@ -64,11 +64,24 @@ class TestCustomLRScheduler:
         X, y = mlp_data
         model = _make_model(3, lr=0.01)
         sched = CustomLRScheduler(warmup_epochs=0, max_lr=0.01, min_lr=0.0001,
-                                  patience=2, factor=0.5)
+                                  patience=1, factor=0.5)
         sched.set_model(model)
         sched.on_epoch_end(0, {'val_loss': 1.0})
+        assert _lr(model) == pytest.approx(0.01)
         sched.on_epoch_end(1, {'val_loss': 2.0})
         assert _lr(model) == pytest.approx(0.005)
+
+    def test_up_every_counts_from_second_epoch(self, mlp_data):
+        X, y = mlp_data
+        model = _make_model(3, lr=0.001)
+        sched = CustomLRScheduler(warmup_epochs=0, max_lr=0.01, min_lr=0.0001,
+                                  patience=100, up_every=2, up_factor=2)
+        sched.set_model(model)
+        sched.on_epoch_end(0, {'val_loss': 1.0})
+        sched.on_epoch_end(1, {'val_loss': 1.0})
+        assert _lr(model) == pytest.approx(0.001)
+        sched.on_epoch_end(2, {'val_loss': 1.0})
+        assert _lr(model) == pytest.approx(0.002)
 
 
 class TestRunMLP:

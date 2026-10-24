@@ -62,7 +62,7 @@ class CustomLRScheduler(Callback):
         current_score = logs.get(self.monitor)
         if self.best is None:
             self.best = current_score
-        if (self.mode == 'min' and current_score >= self.best) or (self.mode == 'max' and current_score <= self.best):
+        elif (self.mode == 'min' and current_score >= self.best) or (self.mode == 'max' and current_score <= self.best):
             self.notices = self.notices + 1
         else:
             self.notices = 0
@@ -80,7 +80,7 @@ class CustomLRScheduler(Callback):
             mode = self.mode
         if self.up_best is None:
             self.up_best = up_score
-        if (mode == 'min' and up_score < self.up_best) or (mode == 'max' and up_score > self.up_best):
+        elif (mode == 'min' and up_score < self.up_best) or (mode == 'max' and up_score > self.up_best):
             self.up_count = self.up_count - self.success_backdown
             self.up_best = up_score
             if self.up_count < 0:

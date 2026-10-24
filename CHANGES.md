@@ -3,6 +3,7 @@
 * **[Breaking change]** Internal - Bump minimum Python version from 3.7 (EOL) to 3.11 (required by keras 3.15)
 * **[Breaking change]** Internal - Require `keras>=3.15.0`, `numpy>=1.22` and `scikit-learn>=1.5.0` to clear security advisories; relock (Pygments 2.21.0, zipp dropped)
 * **[Breaking change]** Feature - Add shape validation to `crps_score` and extract `CRPS_BINS` constant for the hardcoded 199
+* **[Breaking change]** Bugfix - `CustomLRScheduler` no longer counts the first epoch after warmup toward `patience` or `up_every`, so `patience=N` drops LR after N non-improving epochs, not N-1
 * Feature - Support for `init_score`.
 * Feature - Lambdarank predictions now correctly reconstitute `init_score` (raw score + init_score → sigmoid) instead of using the binary logit round-trip.
 * Feature - Support for per-row `sample_weight` in `runLGB` via the `sample_weight_col` param (mirrors `init_score_col`).
