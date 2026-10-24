@@ -14,12 +14,12 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9"
-keras = "*"
+python = ">=3.11"
+keras = ">=3.15.0"
 lightgbm = "*"
-numpy = "*"
+numpy = ">=1.22"
 pandas = "*"
-scikit-learn = "*"
+scikit-learn = ">=1.5.0"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "*"
